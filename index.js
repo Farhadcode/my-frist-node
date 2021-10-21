@@ -16,8 +16,13 @@
 //     console.log('local host listening to port', port);
 // })
 
-const express = require('express')
-const app = express()
+const express = require('express');
+const cors = require('cors');
+const app = express();
+
+
+app.use(cors());
+app.use(express.json());
 
 const port = process.env.PORT || 5000;
 
@@ -59,7 +64,7 @@ const users = [
     },
 ]
 
-
+// use dynamic API
 app.get('/users/:id', (req, res) => {
     // console.log(req.params.id);
 
@@ -68,9 +73,45 @@ app.get('/users/:id', (req, res) => {
     res.send(result)
 });
 
+
+// use query parameter
+
+app.get('/users', (req, res) => {
+    const search = req.query.search;
+    if (search) {
+        const searchResult = users.filter(user => user.name.toLocaleLowerCase().includes(search));
+        res.send(searchResult)
+    }
+    else {
+        res.send(users)
+    }
+
+})
+
+// app  method or http method
+app.post('/users', (req, res) => {
+    const newUser = req.body;
+    newUser.id = users.length;
+    users.push(newUser);
+
+    console.log('hitting the post', req.body);
+    // res.send(JSON.stringify(newUser))
+    res.json(newUser)
+})
+
+// app.get('/users', (req, res) => {
+//     console.log(req.query);
+//     res.send(users)
+// })
+
 app.get('/users', (req, res) => {
     res.send(users)
 });
+
+
+app.get('/product/mango/fujli', (req, res) => {
+    res.send('fujli is the biges mango ')
+})
 
 app.listen(port, () => {
     console.log('local host ', port);
